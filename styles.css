@@ -1,8 +1,23 @@
 body {
-    margin: 0;
+    background-color:rgb(251, 228, 255);
+}
+
+h1 {
+    margin-left: 540px;
+    font-family: Verdana;
+    font-size: 50px;
+}
+
+video {
+    position: relative;
+    /* background-color:rgb(57, 26, 62); */
+    /* transform: rotateY(180deg); */
+    /* -webkit-transform:rotateY(180deg); Safari and Chrome */
+    /* -moz-transform:rotateY(180deg); Firefox */
+}
+
+.center {
     padding: 0;
-    width: 100vw;
-    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
