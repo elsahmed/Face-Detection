@@ -2,8 +2,9 @@ body {
     background-color:rgb(251, 228, 255);
 }
 
-h1 {
-    margin-left: 540px;
+.heading {
+    /* margin-left: 540px; */
+    text-align: center;
     font-family: Verdana;
     font-size: 50px;
 }
