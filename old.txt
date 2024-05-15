@@ -1,0 +1,85 @@
+const video = document.getElementById('video') // gets video element
+const div = document.getElementById('div') // gets div element that holds video elememt 
+
+// video.style.transform = "rotateY(180deg)";
+
+// gets the x and y coordinates of the video
+const video_x = video.getBoundingClientRect().left; 
+const video_y= video.getBoundingClientRect().top;
+
+document.getElementById("xy-cord").innerHTML= video_x + ' x ' + video_y;
+
+// loads all the faceapi models
+Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+    faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+    faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+    faceapi.nets.faceExpressionNet.loadFromUri('/models')
+  ]).then(startVideo)
+
+// start the video and send error is cannot start
+function startVideo() {
+    navigator.getUserMedia(
+        { video: {} },
+        stream => video.srcObject = stream,
+        err => console.error(err)
+    )
+}
+// when video starts follow
+video.addEventListener('play', () => {
+    const canvas = faceapi.createCanvasFromMedia(video) // creates a canvas
+    div.append(canvas) // adds canvs to the div with the video
+    const displaySize = { width: video.width, height: video.height }
+    faceapi.matchDimensions(canvas, displaySize)
+
+    setInterval(async () => {
+        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
+        // console.log(detections)
+
+        // if (detections.length > 0) {
+        //     // Get the position of the first detected face
+        //     const facePosition = detections[0].detection.box;
+        //     // Update the position of the canvas relative to the videos
+        //     // canvas.style.left = `${facePosition.x}px`;
+        //     // canvas.style.top = `${facePosition.y}px`;
+        //     // facePosition.x = facePosition.x*-1;
+        //     // facePosition.y = facePosition.y;
+        //     // const video_x = -video.getBoundingClientRect().left; 
+        //     // const video_y= -video.getBoundingClientRect().top;
+        //     // document.getElementById("xy-cord").innerHTML= video_x + ' x ' + video_y;
+        //     // console.log("x: " + facePosition.x + " y: " + facePosition.y)
+
+        //     if(facePosition.x < 200){ // head is actually to the right
+        //         console.log("hello")
+        //         // facePosition.x = 400 - (200 - facePosition.x);
+        //         // canvas.style.left = `${(400 - (200 - facePosition.x))}px`;
+        //     } else if(facePosition.x > 200){ // head is actually to the right
+        //         console.log("bye")
+        //         // facePosition.x = (400 - facePosition.x);
+        //         // canvas.style.left = `${(400 - facePosition.x)}px`;
+        //     }
+        // }
+
+        const resizedDetections = faceapi.resizeResults(detections, displaySize)
+        // console.log(resizedDetections)
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height) // clears the rect
+        // draws the fact detection
+        faceapi.draw.drawDetections(canvas, resizedDetections)
+
+        // faceapi.draw.drawDetections(canvas, resizedDetections.map(det => {
+        //     // Adjust the position of each detection
+
+        //     if(det.detection.box.x < 200){ // head is actually to the right
+        //         console.log("hello")
+        //         det.detection.box.x = 400 - (200 - det.detection.box.x);
+        //     } else if(det.detection.box.x > 200){ // head is actually to the right
+        //         console.log("bye")
+        //         det.detection.box.x = (400 - det.detection.box.x);
+        //     }
+        //     return det;
+        // }));
+
+        // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
+        faceapi.draw.drawFaceExpressions(canvas, resizedDetections)
+    }, 100)
+  })

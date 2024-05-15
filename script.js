@@ -1,4 +1,5 @@
 const video = document.getElementById('video') // gets video element
+const image = document.getElementById('imageUpload') // gets video element
 const div = document.getElementById('div') // gets div element that holds video elememt 
 
 // gets the x and y coordinates of the video
@@ -23,31 +24,19 @@ function startVideo() {
         err => console.error(err)
     )
 }
-
 // when video starts follow
 video.addEventListener('play', () => {
-    const canvas = faceapi.createCanvasFromMedia(video)
-    // document.body.append(canvas)
-    div.append(canvas)
+    const canvas = faceapi.createCanvasFromMedia(video) // creates a canvas
+    div.append(canvas) // adds canvs to the div with the video
     const displaySize = { width: video.width, height: video.height }
     faceapi.matchDimensions(canvas, displaySize)
 
     setInterval(async () => {
         const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
-        console.log(detections)
-        // if (detections.length > 0) {
-        //     // Get the position of the first detected face
-        //     const facePosition = detections[0].detection.box;
-        //     // Update the position of the canvas relative to the videos
-        //     // canvas.style.left = `${(facePosition.x+150)*-1}px`;
-        //     // canvas.style.top = `${(facePosition.y)*-1}px`;
-        //     facePosition.x = facePosition.x*-1;
-        //     facePosition.y = facePosition.y*-1;
-            
-        // }
-
         const resizedDetections = faceapi.resizeResults(detections, displaySize)
-        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
+        // console.log(resizedDetections)
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height) // clears the rect
+        // draws the fact detection
         faceapi.draw.drawDetections(canvas, resizedDetections)
         // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
         faceapi.draw.drawFaceExpressions(canvas, resizedDetections)
